@@ -1,22 +1,20 @@
 const crypto = require('crypto');
 
 /**
- * Generates an immutable SHA-256 cryptographic hash acting as a digital fingerprint.
- * @param {Object} evidenceData - Incoming structured automated payload
- * @returns {string} Hexadecimal tamper-proof verification signature
+ * Generates a unique SHA-256 cryptographic seal for the evidence data package.
+ * @param {string} url - The web page address where harassment occurred.
+ * @param {string} timestamp - The ISO format network timestamp of the capture.
+ * @param {string} text - The raw text evidence scraped from the screen.
+ * @returns {string} The SHA-256 hexadecimal validation hash.
  */
-function generateForensicHash(evidenceData) {
-    // Rigidly sequence the core fields to preserve strict data integrity
-    const rawSequenceString = [
-        evidenceData.url,
-        evidenceData.timestamp,
-        evidenceData.evidenceText
-    ].join('||');
+function generateHash(url, timestamp, text) {
+    const backupTimestamp = timestamp || new Date().toISOString();
     
-    return crypto
-        .createHash('sha256')
-        .update(rawSequenceString)
-        .digest('hex');
+    // Combine fields into an immutable data string payload
+    const dataPackage = `URL:${url}|TIME:${backupTimestamp}|TEXT:${text}`;
+    
+    // Create the SHA-256 digital signature
+    return crypto.createHash('sha256').update(dataPackage).digest('hex');
 }
 
-module.exports = { generateForensicHash };
+module.exports = { generateHash };
