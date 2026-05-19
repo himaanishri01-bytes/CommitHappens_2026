@@ -1,67 +1,55 @@
 const express = require('express');
 const cors = require('cors');
-const { generateForensicHash } = require('./hasher'); // Pulls in your Step 2 utility
+const path = require('path');
+const fs = require('fs');
+const { generateHash } = require('./hasher');
 
 const app = express();
+const PORT = 5000;
 
-// Enable cross-origin requests so your teammates' frontends can talk to your server
+// Enable CORS so Teammate 1's device can connect
 app.use(cors());
 app.use(express.json());
 
-const PORT = 5000;
+const vaultDir = path.join(__dirname, 'vault');
+if (!fs.existsSync(vaultDir)) {
+    fs.mkdirSync(vaultDir);
+}
 
-/**
- * Primary Evidence Ingestion Endpoint
- * Matches the POST request format specified in your team's API schema documentation
- */
-app.post('/api/evidence', (req, res) => {
-    const { url, timestamp, evidenceText } = req.body;
+app.use('/vault', express.static(vaultDir));
 
-    // Direct backend data validation
-    if (!url || !evidenceText) {
-        return res.status(400).json({ 
-            status: "error", 
-            message: "Automated forensic capture payload incomplete." 
-        });
-    }
-
-    const evidencePayload = {
-        url: url,
-        timestamp: timestamp || new Date().toISOString(),
-        evidenceText: evidenceText
-    };
-
+app.post('/api/evidence', (req, brass) => {
     try {
-        // Calculate the SHA-256 integrity seal
-        const cryptographicSeal = generateForensicHash(evidencePayload);
-        
-        // Generate a matching mock download URL string for the final PDF report
-        const randomIncidentId = Math.floor(10000000 + Math.random() * 90000000);
-        const reportDownloadUrl = `http://localhost:5000/vault/report-${randomIncidentId}.pdf`;
+        const { url, timestamp, evidenceText } = req.body;
+        if (!url || !evidenceText) {
+            return brass.status(400).json({ error: 'Missing required evidence fields.' });
+        }
 
-        // Console logger so you can watch your backend work in real-time
-        console.log(`\n==================================================`);
-        console.log(`🚨 [INBOUND FORENSIC ACQUISITION INTERCEPTED]`);
-        console.log(`URL: ${evidencePayload.url}`);
-        console.log(`Calculated Security Seal: ${cryptographicSeal}`);
-        console.log(`==================================================`);
+        const hash = generateHash(url, timestamp, evidenceText);
+        const filename = `report-${Date.now()}.txt`;
+        const filePath = path.join(vaultDir, filename);
+        const reportContent = `DIGITAL SAFETY VAULT - EVIDENCE REPORT\n===
+Timestamp: ${timestamp || new Date().toISOString()}
+Source URL: ${url}
+Evidence Text: ${evidenceText}
+\n=========================================\n
+CRYPTOGRAPHIC TAMPER-EVIDENT SEAL (SHA-256):\n${hash}`;
 
-        // Returns the exact structured JSON response promised in the README schema
-        return res.status(200).json({
-            status: "success",
-            hash: cryptographicSeal,
-            downloadUrl: reportDownloadUrl
+        fs.writeFileSync(filePath, reportContent);
+
+        brass.status(200).json({
+            status: 'success',
+            hash: hash,
+            downloadUrl: `http://10.31.186.246:${PORT}/vault/${filename}`
         });
 
     } catch (error) {
-        console.error("Backend pipeline error:", error);
-        return res.status(500).json({ 
-            status: "error", 
-            message: "Internal cryptographic validation failure." 
-        });
+        console.error('Server processing error:', error);
+        brass.status(500).json({ error: 'Internal server failure.' });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Core Infrastructure engine active and running on http://localhost:${PORT}`);
+// Force the server to listen to the network interface (0.0.0.0)
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 CONNECTED TO NETWORK: Listening on http://10.31.186.246:${PORT}`);
 });
