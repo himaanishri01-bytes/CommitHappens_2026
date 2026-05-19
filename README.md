@@ -1,97 +1,94 @@
-# Commit Happens 2026
-# The Digital Safety Vault
+# Digital Safety Vault (DSV)
 
-### Cross-Platform Evidence Preservation Utility
+An automated, full-stack, and tamper-evident digital evidence preservation system built to secure web data with cryptographic integrity seals.
 
-**Category:** Digital Safety & Legal Tech
+## Problem Statement and Core Solution
 
-## The Problem & Core Concept
+### The Problem
 
-When victims of cyberbullying or online harassment attempt to take legal or disciplinary action, their evidence is often deleted by the perpetrator, or standard screenshots are rejected by authorities because they lack metadata and can be easily altered or faked.
+In the modern digital landscape, online harassment, intellectual property theft, corporate non-compliance, and digital fraud are rampant. However, standard screenshots or text copies are legally unreliable because they can be easily manipulated via browser developer tools (Inspect Element) or image editing software. Proving the authenticity of web-based evidence at a specific point in time remains a major hurdle for individuals, legal professionals, and corporations.
 
-The Digital Safety Vault instantly captures online harassment, links it to unalterable metadata, runs it through a cryptographic engine to create a "tamper-proof digital seal," and compiles it into an official, structured legal report ready for law enforcement or university authorities.
+### Our Solution
 
-## Technical Workflow
+Digital Safety Vault introduces a decentralized approach to digital forensics. With a single click from a lightweight browser extension, the system securely isolates, extracts, and transmits active web content to an automated backend server.
 
-```text
-[Frontend Channels]                                   [Backend Core Engine]
+The backend instantly compiles this data into a structured PDF report and seals it using SHA-256 cryptographic hashing. Any attempt to modify the report post-capture breaks the cryptographic chain, making this tool a definitive source of truth for legally admissible digital evidence.
 
-1A. Desktop Extension (Scrapes Text & URL)   ───┐
-                                                ├───> POST /api/evidence ───> 2. Generate SHA-256 Hash
-1B. Mobile Web Form (Manual Text & Upload)   ───┘                             │
-                                                                              v
-4. User Downloads Official PDF Report <─── 3. Compile PDF Document <─── Store Data in Local Vault
+## Tech Stack and Architecture
 
-```
+* Frontend: HTML5, CSS3, JavaScript (Chrome Extension Manifest V3 API)
+* Backend: Node.js, Express.js
+* Cryptographic Engine: Node crypto library (SHA-256 Hashing)
+* Document Processor: pdfkit (Dynamic Forensic PDF Compilation)
 
-1. **Ingestion:** The user triggers a capture via the Chrome Extension (automated text/URL scraping) or the Mobile Web Form (manual text & image upload).
-2. **Transmission:** The frontend packages the data into a JSON payload and transmits it to our backend via an HTTP POST request to `/api/evidence`.
-3. **Hashing:** The backend merges the fields and calculates a unique SHA-256 cryptographic hash: `Package = URL + Timestamp + Evidence Text`. If a single character of the evidence text is altered later, the hash breaks, immediately proving tampering.
-4. **Document Generation:** The backend compiles the verified metadata, raw logs, and the unique validation hash into a formal, tamper-evident PDF report stored in a secure local directory.
+## Step-by-Step Walkthrough (How to Verify Our Work)
 
-## Tech Stack
+Follow these precise steps to initialize the automated ecosystem locally and generate your first secured asset.
 
-* **Extension Frontend:** Vanilla JavaScript, HTML5, CSS3 (Chrome Extension Manifest V3 API)
-* **Mobile Frontend Portal:** HTML5, CSS3, JavaScript
-* **Backend Server Engine:** Node.js, Express
-* **Core Libraries:** `crypto` (native hashing), `pdfkit` (PDF generation), `cors`
+### Step 1: Initialize and Launch the Backend Server
 
-## Project Structure
-
-```text
-digital-safety-vault/
-├── README.md
-├── package.json
-├── package-lock.json
-├── hasher.js
-├── server.js
-└── vault/
-
-```
-
-## Getting Started
-
-Follow these steps to run the backend engine locally.
-
-### 1. Set Up the Backend Server
-
-Install the required packages and launch the server directly from the project root directory:
-
-```bash
+1. Open your terminal or Command Prompt.
+2. Navigate into the project's backend directory:
+cd backend
+3. Install the required Node dependencies specified in the manifest:
 npm install
+4. Boot up the automated server listener:
 node server.js
+Verification Check: The terminal will immediately flash: "AUTOMATED BACKEND ACTIVE: Listening on http://localhost:5000"
 
-```
+### Step 2: Inject the Forensic Extension into Chrome
 
-The backend server will run on `http://localhost:5000`.
+1. Launch Google Chrome and navigate to the extensions panel by entering: chrome://extensions/
+2. In the upper-right corner, toggle the Developer mode switch to ON.
+3. In the upper-left corner, click the Load unpacked button.
+4. Select the Extension folder from this project directory.
+Verification Check: You will see the "Digital Safety Vault Evidence Capture 1.0" card drop cleanly onto your active browser environment.
 
-### 2. Install the Chrome Extension
+### Step 3: Trigger the Evidence Pipeline
 
-1. Open Google Chrome and navigate to `chrome://extensions/`.
-2. Enable **Developer mode** using the toggle switch in the top-right corner.
-3. Click **Load unpacked** in the top-left corner.
-4. Select the project repository folder containing the extension assets.
+1. Open a new tab and head to a live, public webpage (such as [https://en.wikipedia.org](https://en.wikipedia.org) or [https://www.google.com](https://www.google.com)).
+2. Click the puzzle piece icon in your extensions toolbar and open Digital Safety Vault.
+3. Click the blue CAPTURE EVIDENCE button.
+4. Watch the status text beneath the button. It will instantly change to "Capturing..." and then lock into "Evidence secured successfully!"
 
-## API Data Exchange
+### Step 4: Inspect the Forensic Vault Archive
 
-When data is sent from either frontend channel to `POST http://localhost:5000/api/evidence`, it uses the following structure:
+1. Open your file explorer and navigate into the project directory at backend/vault/.
+2. A newly generated, timestamped PDF file will be sitting inside.
+3. Open the file to review the compiled structure, absolute timestamp metrics, extracted text strings, and the SHA-256 tamper-evident cryptographic block printed at the bottom.
 
-```json
-{
-  "url": "https://example.com/harassment-source",
-  "timestamp": "2026-05-19T13:58:35Z",
-  "evidenceText": "UserXyz sent intimidating messages on this public forum."
-}
+## Business and Monetization Strategy
 
-```
+To ensure scalable growth, long-term commercial sustainability, and market penetration, Digital Safety Vault implements a tiered usage matrix tailored for individual, corporate, and enterprise consumers.
 
-The server processes the package and responds with:
+### Free / Retail Tier
 
-```json
-{
-  "status": "success",
-  "hash": "8f3c3a9d82129c97b8bb5d81b85521b4a49646b149b934ca495991b7852b855f",
-  "downloadUrl": "http://localhost:5000/vault/report-1716127115.pdf"
-}
+* Quota: 5 Captures / Day
+* Target Demographic: Everyday Internet Users
+* Use-Case: Storing personal proof of online cyberbullying, retail scam receipts, or social media harassment.
 
-```
+### Premium Pro Tier
+
+* Quota: 15 Captures / Day
+* Target Demographic: Independent Investigators, Freelancers, and Journalists
+* Use-Case: Logging investigative leads, securing whistleblowing records, and archiving digital footprints.
+
+### Enterprise / Corporate Tier (Level 1)
+
+* Quota: 50 Captures / Day
+* Target Demographic: Mid-Market SMBs, Legal Firms, and Specialized Agencies
+* Use-Case: Managing small-scale compliance records, tracking corporate copyright infringement, and case building.
+
+### Enterprise / Corporate Tier (Level 2)
+
+* Quota: 100 Captures / Day
+* Target Demographic: Large Conglomerates, Tech Corporates, and Academic Institutions
+* Use-Case: Auditing mass digital assets, university research validation, preventing campus academic fraud, and high-frequency litigation management.
+
+### Enterprise Customization
+
+For global corporations and Tier-1 academic institutions requiring infinite throughput, custom organizational licenses can be provisioned with dedicated server clustering, automated backup nodes, and custom API webhooks right into existing internal security dashboards.
+
+## Conclusion
+
+Digital Safety Vault successfully bridges the gap between web browsing and legal enforceability. By pairing a lightweight, user-friendly Chrome extension frontend with a robust, automated backend server, the platform transforms volatile web pages into permanent, cryptographically sealed forensic documents. The strict adherence to Chrome Manifest V3 security standards ensures safety and compliance, while the scalable, tiered enterprise model establishes a clear path toward market monetization. This architecture provides an accessible, un-editable, and definitive framework for protecting digital truth and authenticity across the internet.
